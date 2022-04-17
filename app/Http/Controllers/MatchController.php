@@ -77,4 +77,9 @@ class MatchController extends Controller
         return Match::query()->where('target_user_id', $user_id)->get();
     }
 
+    public function theMatched($user_id)
+    {
+        return dd(Match::query()->where('user_id', $user_id)->get());
+    }
+
 }

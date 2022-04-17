@@ -29,8 +29,10 @@ Route::group(['middleware' => ['auth:sanctum']],function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::resource('matches', MatchController::class);
-    Route::get('/matches/search/{user_id}', [MatchController::class, 'search']);
-    Route::get('/matches/search2/{user_id}', [MatchController::class, 'searchSecond']);
+    Route::get('/matches/i-liked/{user_id}', [MatchController::class, 'search']);
+    Route::get('/matches/who-likes-me/{user_id}', [MatchController::class, 'searchSecond']);
+
+    Route::post('/update-profile/{id}', [AuthController::class, 'updateProfile']);
 });
 
 //Route::get('/matches', [\App\Http\Controllers\MatchController::class, 'index']);

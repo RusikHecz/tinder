@@ -22,7 +22,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'age',
+        'image',
     ];
+
+    protected $table = 'users';
+    protected $guarded = false;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -46,5 +51,10 @@ class User extends Authenticatable
     public function match()
     {
         return $this->belongsTo(Match::class, 'category_id', 'id');
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'user_tags', 'user_id', 'tag_id');
     }
 }
