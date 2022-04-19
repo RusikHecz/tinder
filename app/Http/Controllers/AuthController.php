@@ -105,9 +105,7 @@ class AuthController extends Controller
             $tagIds = $data['tag_ids'];
             unset($data['tag_ids']);
             $user->tags()->sync($tagIds);
-            $user->update();
-
-
+            $user->save();
 
             return response()->json(['message' => 'success']);
         } catch (\Exception $exception) {

@@ -22,17 +22,18 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'create']);
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::resource('matches', MatchController::class);
+Route::get('/matches/i-liked/{user_id}', [MatchController::class, 'search']);
+Route::get('/matches/who-likes-me/{user_id}', [MatchController::class, 'searchSecond']);
+Route::get('/matches/matched/{user_id}/{target_id}', [MatchController::class, 'theMatched']);
 
+Route::post('/update-profile/{id}', [AuthController::class, 'updateProfile']);
 
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']],function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::resource('matches', MatchController::class);
-    Route::get('/matches/i-liked/{user_id}', [MatchController::class, 'search']);
-    Route::get('/matches/who-likes-me/{user_id}', [MatchController::class, 'searchSecond']);
 
-    Route::post('/update-profile/{id}', [AuthController::class, 'updateProfile']);
 });
 
 //Route::get('/matches', [\App\Http\Controllers\MatchController::class, 'index']);

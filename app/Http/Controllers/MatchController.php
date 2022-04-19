@@ -11,6 +11,19 @@ class MatchController extends Controller
      *
      * @return Match[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Http\Response
      */
+    const pending = 0;
+    const accepted = 1;
+    const rejected = -1;
+
+    public static function getMatches()
+    {
+        return [
+            self::pending => 'Отправлено',
+            self::accepted => 'Принято',
+            self::rejected => 'Отказано',
+        ];
+    }
+
     public function index()
     {
         return Match::all();
@@ -77,9 +90,9 @@ class MatchController extends Controller
         return Match::query()->where('target_user_id', $user_id)->get();
     }
 
-    public function theMatched($user_id)
+    public function theMatched($user_id, $target_id)
     {
-        return dd(Match::query()->where('user_id', $user_id)->get());
+        Match::query()->where('user_id', $user_id)->where('target_user_id', $target_id)->update(['status' => 1]);
     }
 
 }
