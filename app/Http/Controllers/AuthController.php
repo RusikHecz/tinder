@@ -2,36 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ImageUploadRequest;
+use App\Http\Requests\Auth\StoreRequest;
 
+use App\Models\SaveImage;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
-    public function create(Request $request)
+    public function create(StoreRequest $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'min:2'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'tag_ids' => 'nullable|array',
-            'tag_ids.*' => 'nullable|integer|exists:tags,id',
-        ]);
+        $data = $request->validated();
 
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $data['password'] = Hash::make($data['password']);
+        $data['image'] = $request['image'];
+        $user = User::firstOrCreate(['email' => $data['email']],$data);
+        event(new Registered($user));
 
-        $tagIds = $data['tag_ids'];
-
-        unset($data['tag_ids']);
-
-        $user->tags()->attach($tagIds);
+        $this->service->store($data);
 
         $token = $user->createToken('remember_token')->plainTextToken;
 
@@ -79,7 +69,7 @@ class AuthController extends Controller
         ];
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(Request $request, $id)
     {
         try {
             $data = $request->validate([
@@ -90,16 +80,16 @@ class AuthController extends Controller
                 'tag_ids.*' => 'nullable|integer|exists:tags,id',
             ]);
 
-            $user = User::find($request->user()->id);
+            $user = User::find($id);
 
             $user->name = $data['name'];
-//            $user->email = $data['email'];
 
-            if ($data['image'] && $data['image']->isValid()) {
-                $file_name = time() . '.' . $data['image']->extension();
-                $data['image']->move(public_path('images'), $file_name);
-                $path = "public/images/$file_name";
-                $user->image = $path;
+            if (isset($request['image'])) {
+                $gallery = $request->file('image');
+
+                $saveImage = SaveImage::sv($gallery);
+
+                $user -> image = $saveImage;
             }
 
             $tagIds = $data['tag_ids'];
