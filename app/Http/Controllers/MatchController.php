@@ -91,7 +91,6 @@ class MatchController extends Controller
     {
        $iLiked = Match::query()->where('user_id', $user_id)->get();
 
-       dd($iLiked->user_id);
        return User::query()->where('id', $iLiked['user_id'])->get();
 
     }
