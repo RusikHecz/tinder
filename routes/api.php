@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'create']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/me', [AuthController::class, 'findByToken']);
 
 Route::resource('matches', MatchController::class);
 Route::get('/matches/i-liked/{user_id}', [MatchController::class, 'search']);

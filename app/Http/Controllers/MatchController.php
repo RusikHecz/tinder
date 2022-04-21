@@ -89,15 +89,17 @@ class MatchController extends Controller
      */
     public function search($user_id)
     {
-       $iLiked = Match::query()->where('user_id', $user_id)->get();
+       $iLiked = Match::query()->select('target_user_id')->where('user_id', $user_id)->get();
 
-       return User::query()->where('id', $iLiked['user_id'])->get();
+       return User::query()->whereIn('id', $iLiked)->get();
 
     }
 
     public function searchSecond($user_id)
     {
-        return Match::query()->where('target_user_id', $user_id)->get();
+        $likedMe = Match::query()->select('user_id')->where('target_user_id', $user_id)->get();
+
+        return User::query()->whereIn('id', $likedMe)->get();
     }
 
     public function theMatched($user_id, $target_id, $status)

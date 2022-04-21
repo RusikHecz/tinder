@@ -9,6 +9,7 @@ use App\Models\SaveImage;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends BaseController
@@ -18,7 +19,7 @@ class AuthController extends BaseController
         $data = $request->validated();
 
         $data['password'] = Hash::make($data['password']);
-        $data['image'] = $request['image'];
+
         $user = User::firstOrCreate(['email' => $data['email']], $data);
         event(new Registered($user));
 
@@ -54,7 +55,6 @@ class AuthController extends BaseController
         $token = $user->createToken('remember_token')->plainTextToken;
 
         $response = [
-            'user' => $user,
             'token' => $token
         ];
 
@@ -83,5 +83,13 @@ class AuthController extends BaseController
         ];
 
         return response($response, 201);
+    }
+
+    public function findByToken(Request $request)
+    {
+        $user_token = $request->authorization;
+        $user_id = DB::table('personal_access_tokens')->where('token', $user_token)->first();
+//        echo $user_id->tokenable_id;
+        return User::query()->where('id', $user_id->tokenable_id)->get();
     }
 }
