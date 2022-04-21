@@ -41,25 +41,30 @@ class UserServices
         }
     }
 
-    public function update($data, $post)
+    public function update($data, $id)
     {
         try {
             DB::beginTransaction();
+
+            $user = User::find($id);
 
             if (isset($data['tag_ids'])) {
                 $tagIds = $data['tag_ids'];
                 unset($data['tag_ids']);
             }
 
-            if (isset($data['preview_image'])) {
-                $data['preview_image'] = Storage::disk('public')->put('/images', $data['preview_image']);
+            if (isset($data['image'])) {
+                $gallery = $data['image'];
+
+                $saveImage = SaveImage::sv($gallery);
+
+                $user->image = $saveImage;
             }
-            if (isset($data['main_image'])) {
-                $data['main_image'] = Storage::disk('public')->put('/images', $data['main_image']);
-            }
-            $post->update($data);
+
+            $user->save();
+
             if (isset($tagIds)) {
-                $post->tags()->sync($tagIds);
+                $user->tags()->sync($tagIds);
             }
 
             DB::commit();
@@ -68,6 +73,5 @@ class UserServices
             abort(500);
         }
 
-        return $post;
     }
 }

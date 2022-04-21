@@ -72,6 +72,12 @@ class MatchController extends Controller
     public function destroy($id)
     {
         Match::destroy($id);
+
+        $response = [
+            "message" => "лайк удален"
+        ];
+
+        return response($response, 201);
     }
 
     /**
@@ -90,9 +96,15 @@ class MatchController extends Controller
         return Match::query()->where('target_user_id', $user_id)->get();
     }
 
-    public function theMatched($user_id, $target_id)
+    public function theMatched($user_id, $target_id, $status)
     {
-        Match::query()->where('user_id', $user_id)->where('target_user_id', $target_id)->update(['status' => 1]);
+        Match::query()->where('user_id', $user_id)->where('target_user_id', $target_id)->update(['status' => $status]);
+
+        $response = [
+            "message" => "Статус отправлен"
+        ];
+
+        return response($response, 201);
     }
 
 }
