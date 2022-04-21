@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use \App\Models\Match;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class MatchController extends Controller
@@ -88,7 +89,11 @@ class MatchController extends Controller
      */
     public function search($user_id)
     {
-       return Match::query()->where('user_id', $user_id)->get();
+       $iLiked = Match::query()->where('user_id', $user_id)->get();
+
+       dd($iLiked->user_id);
+       return User::query()->where('id', $iLiked['user_id'])->get();
+
     }
 
     public function searchSecond($user_id)
