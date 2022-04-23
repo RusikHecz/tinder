@@ -54,7 +54,7 @@ class AuthController extends BaseController
 
         $token = $user->createToken('remember_token')->plainTextToken;
         $token = DB::table('personal_access_tokens')->select('token')->where('tokenable_id', $user->id)->first();
-        $response = [gi
+        $response = [
             'user' => $user,
             'token' => $token
         ];
