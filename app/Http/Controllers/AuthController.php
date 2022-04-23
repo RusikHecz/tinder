@@ -26,7 +26,7 @@ class AuthController extends BaseController
         $this->service->store($data);
 
         $token = $user->createToken('remember_token')->plainTextToken;
-
+        $token = DB::table('personal_access_tokens')->select('token')->where('tokenable_id', $user->id)->first();
         $response = [
             'user' => $user,
             'token' => $token
@@ -53,8 +53,9 @@ class AuthController extends BaseController
         }
 
         $token = $user->createToken('remember_token')->plainTextToken;
-
-        $response = [
+        $token = DB::table('personal_access_tokens')->select('token')->where('tokenable_id', $user->id)->first();
+        $response = [gi
+            'user' => $user,
             'token' => $token
         ];
 
@@ -91,5 +92,6 @@ class AuthController extends BaseController
         $user_id = DB::table('personal_access_tokens')->where('token', $user_token)->first();
 //        echo $user_id->tokenable_id;
         return User::query()->where('id', $user_id->tokenable_id)->get();
+
     }
 }
