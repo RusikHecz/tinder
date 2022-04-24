@@ -11,4 +11,9 @@ class Match extends Model
 
     protected $table = 'matches';
     protected $guarded = false;
+
+    public function match()
+    {
+        return $this->belongsTo(User::class, 'target_user_id', 'id');
+    }
 }

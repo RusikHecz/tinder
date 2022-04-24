@@ -117,7 +117,7 @@ class MatchController extends Controller
         return User::query()->whereIn('id', $likedMe)->get();
     }
 
-    public function like(StoreRequest $req, Request $request, $target_id)
+    public function like(StoreRequest $request)
     {
         $user_token = $request->authorization;
 
@@ -125,16 +125,22 @@ class MatchController extends Controller
 
         $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
 
-        $data = $req->validated();
+        $data = $request->validated();
 
         $data['user_id'] = $user_id;
-        $data['user_target_id'] = $target_id;
+        $data['target_user_id'] = $request->target_user_id;
 
-        $data->save();
+        $match = new Match(array(
+            'user_id'=>$data['user_id'],
+            'target_user_id' => $data['target_user_id'],
+            'status' => '0'
+        ));
+        $match->save();
 
         $response = [
             "message" => "лайкнуто"
         ];
+        return response($response, 201);
     }
 
     public function theMatched(Request $request, $target_id, $status)
@@ -145,7 +151,27 @@ class MatchController extends Controller
 
         $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
 
-        Match::query()->where('user_id', $user_id)->where('target_user_id', $target_id)->update(['status' => $status]);
+        Match::create([
+            'user_id' => $user_id,
+            'target_user_id' => $target_id,
+            'status' => $status,
+        ]);
+        $response = [
+            "message" => "Статус отправлен"
+        ];
+
+        return response($response, 201);
+    }
+
+    public function changeStatus(Request $request, $target_id, $status)
+    {
+        $user_token = $request->authorization;
+
+        $user = PersonalAccessToken::findToken($user_token);
+
+        $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
+
+        Match::query()->where('user_id', $target_id)->where('target_user_id', $user_id)->update(['status' => $status]);
 
         $response = [
             "message" => "Статус отправлен"
@@ -162,9 +188,8 @@ class MatchController extends Controller
 
         $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
 
-        $likedMe = Match::query()->select('user_id')->where('target_user_id', $user_id)->where('status', 0)->get();
-
-        return User::query()->whereIn('id', $likedMe)->get();
+        return Match::query()->with('match')->orwhere('user_id', $user_id)->orWhere('target_user_id',$user_id)
+            ->where('status', 1)->get();
 
     }
 

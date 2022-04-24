@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ListConversationAndMessages;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\GraphicsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,12 +35,21 @@ Route::resource('matches', MatchController::class);
 Route::get('/matches/i-liked/all', [MatchController::class, 'search']);
 Route::get('/matches/who-likes-me/all', [MatchController::class, 'searchSecond']);
 Route::get('/matches/matched/{target_id}/{status}', [MatchController::class, 'theMatched']);
-Route::get('/matches/like/{target_id}', [MatchController::class, 'like']);
-Route::get('/matches/my-matches', [MatchController::class, 'showMatched']);
+Route::get('/matches/matched/change/{target_id}/{status}', [MatchController::class, 'changeStatus']);
+Route::get('/matches/like/all', [MatchController::class, 'like']);
+Route::get('/matches/my-matches/all', [MatchController::class, 'showMatched']);
 
 Route::get('/messages', [ListConversationAndMessages::class, 'render']);
 Route::get('/messages/view/', [ListConversationAndMessages::class, 'viewMessage']);
 Route::get('/messages/send/', [ListConversationAndMessages::class, 'sendMessage']);
+Route::get('/messages/create-new-chat/', [ListConversationAndMessages::class, 'createChat']);
+
+Route::get('/graphics/males/', [GraphicsController::class, 'getMales']);
+Route::get('/graphics/females/', [GraphicsController::class, 'getFemales']);
+Route::get('/graphics/getOne/', [GraphicsController::class, 'getOne']);
+Route::get('/graphics/getZero/', [GraphicsController::class, 'getZero']);
+
+
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']],function () {
     Route::post('/logout', [AuthController::class, 'logout']);

@@ -100,8 +100,13 @@ class AuthController extends BaseController
         return User::query()->with('tags')->where('id', $id)->first();
     }
 
-    public function allUsers()
+    public function allUsers(Request $request)
     {
-        return User::with('tags')->limit(3)->get();
+        $user_token = $request->authorization;
+
+        $user = PersonalAccessToken::findToken($user_token);
+
+        $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
+        return User::with('tags')->where('id', '!=', $user_id)->limit(3)->get();
     }
 }

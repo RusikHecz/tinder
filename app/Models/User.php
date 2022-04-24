@@ -18,7 +18,14 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'age',
+        'image',
+        'gender'
+    ];
 
     protected $table = 'users';
     protected $guarded = false;
@@ -44,7 +51,7 @@ class User extends Authenticatable
 
     public function match()
     {
-        return $this->belongsTo(Match::class, 'category_id', 'id');
+        return $this->belongsTo(Match::class, 'user_id', 'id');
     }
 
     public function tags()
