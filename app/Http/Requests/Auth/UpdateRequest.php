@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateRequest extends FormRequest
 {
@@ -24,8 +25,10 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'max:255', 'min:2'],
+            'name' => ['nullable','string', 'max:255', 'min:2'],
             'image' => ['nullable', 'image'],
+            'email' => 'nullable','string', 'email', 'max:255', 'unique:users' ,
+            'age' => ['nullable','integer'],
             'tag_ids' => 'nullable|array',
             'tag_ids.*' => 'nullable|integer|exists:tags,id',
         ];
@@ -34,7 +37,6 @@ class UpdateRequest extends FormRequest
         return [
             'name.required' => 'Название обязательный элемент',
             'email.required' => 'Заполните почту',
-            'password.required' => 'Вы забыли придумать пароль',
         ];
     }
 }

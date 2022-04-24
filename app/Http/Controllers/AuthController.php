@@ -11,6 +11,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends BaseController
 {
@@ -26,7 +27,7 @@ class AuthController extends BaseController
         $this->service->store($data);
 
         $token = $user->createToken('remember_token')->plainTextToken;
-        $token = DB::table('personal_access_tokens')->select('token')->where('tokenable_id', $user->id)->first();
+//        $token = DB::table('personal_access_tokens')->select('token')->where('tokenable_id', $user->id)->first();
         $response = [
             'user' => $user,
             'token' => $token
@@ -48,12 +49,12 @@ class AuthController extends BaseController
         // Check password
         if (!$user || !Hash::check($data['password'], $user->password)) {
             return response([
-                'message' => 'Bad creds'
+                'message' => 'Неверный пароль или почта'
             ], 401);
         }
 
         $token = $user->createToken('remember_token')->plainTextToken;
-        $token = DB::table('personal_access_tokens')->select('token')->where('tokenable_id', $user->id)->first();
+//        $token = DB::table('personal_access_tokens')->select('token')->where('tokenable_id', $user->id)->first();
         $response = [
             'user' => $user,
             'token' => $token
@@ -71,13 +72,12 @@ class AuthController extends BaseController
         ];
     }
 
-    public function updateProfile(UpdateRequest $request)
+    public function updateProfile(UpdateRequest $request, $user)
     {
+
         $data = $request->validated();
 
-        $user = auth()->user()->id;
-
-        $this->service->update($data,$user);
+        $this->service->update($data, $user);
 
         $response = [
             'user' => $user,
@@ -89,9 +89,19 @@ class AuthController extends BaseController
     public function findByToken(Request $request)
     {
         $user_token = $request->authorization;
-        $user_id = DB::table('personal_access_tokens')->where('token', $user_token)->first();
-//        echo $user_id->tokenable_id;
+
+        $user_id = PersonalAccessToken::findToken($user_token);
         return User::query()->where('id', $user_id->tokenable_id)->get();
 
+    }
+
+    public function viewUser($id)
+    {
+        return User::query()->with('tags')->where('id', $id)->first();
+    }
+
+    public function allUsers()
+    {
+        return User::with('tags')->limit(3)->get();
     }
 }

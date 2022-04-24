@@ -56,12 +56,12 @@ class UserServices
             if (isset($data['image'])) {
                 $gallery = $data['image'];
 
-                $saveImage = SaveImage::sv($gallery);
+                $data['image'] = SaveImage::sv($gallery);
 
-                $user->image = $saveImage;
+//                $user->image = $saveImage;
             }
 
-            $user->save();
+            $user->update($data);
 
             if (isset($tagIds)) {
                 $user->tags()->sync($tagIds);

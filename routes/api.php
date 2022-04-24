@@ -6,8 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Models\Match;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-
+use App\Http\Controllers\ListConversationAndMessages;
+use App\Http\Controllers\TagController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,17 +21,28 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'create']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/all-users', [AuthController::class, 'allUsers']);
+Route::get('/view/{id}', [AuthController::class, 'viewUser']);
+
 Route::get('/me', [AuthController::class, 'findByToken']);
+Route::get('/tags', [TagController::class, 'show']);
+
+Route::post('/update-profile/me/{user}', [AuthController::class, 'updateProfile']);
 
 Route::resource('matches', MatchController::class);
-Route::get('/matches/i-liked/{user_id}', [MatchController::class, 'search']);
-Route::get('/matches/who-likes-me/{user_id}', [MatchController::class, 'searchSecond']);
-Route::get('/matches/matched/{user_id}/{target_id}/{status}', [MatchController::class, 'theMatched']);
+Route::get('/matches/i-liked/all', [MatchController::class, 'search']);
+Route::get('/matches/who-likes-me/all', [MatchController::class, 'searchSecond']);
+Route::get('/matches/matched/{target_id}/{status}', [MatchController::class, 'theMatched']);
+Route::get('/matches/like/{target_id}', [MatchController::class, 'like']);
+Route::get('/matches/my-matches', [MatchController::class, 'showMatched']);
+
+Route::get('/messages', [ListConversationAndMessages::class, 'render']);
+Route::get('/messages/view/', [ListConversationAndMessages::class, 'viewMessage']);
+Route::get('/messages/send/', [ListConversationAndMessages::class, 'sendMessage']);
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']],function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    Route::post('/update-profile/{id}', [AuthController::class, 'updateProfile']);
 
 
 });

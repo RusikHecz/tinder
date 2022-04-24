@@ -27,7 +27,7 @@ class StoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:255', 'min:2'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'image' => ['nullable', 'image'],
+            'image' => ['nullable', 'file'],
             'tag_ids' => 'nullable|array',
             'tag_ids.*' => 'nullable|integer|exists:tags,id',
         ];

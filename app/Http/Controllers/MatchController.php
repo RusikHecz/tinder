@@ -1,9 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Requests\Match\StoreRequest;
 use \App\Models\Match;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class MatchController extends Controller
 {
@@ -87,23 +90,61 @@ class MatchController extends Controller
      * @param  int  $user_id
      * @return \Illuminate\Http\Response
      */
-    public function search($user_id)
+    public function search(Request $request)
     {
-       $iLiked = Match::query()->select('target_user_id')->where('user_id', $user_id)->get();
+        $user_token = $request->authorization;
+
+        $user = PersonalAccessToken::findToken($user_token);
+
+        $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
+
+        $iLiked = Match::query()->select('target_user_id')->where('user_id', $user_id)->where('status', 0)->get();
 
        return User::query()->whereIn('id', $iLiked)->get();
 
     }
 
-    public function searchSecond($user_id)
+    public function searchSecond(Request $request)
     {
-        $likedMe = Match::query()->select('user_id')->where('target_user_id', $user_id)->get();
+        $user_token = $request->authorization;
+
+        $user = PersonalAccessToken::findToken($user_token);
+
+        $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
+
+        $likedMe = Match::query()->select('user_id')->where('target_user_id', $user_id)->where('status', 0)->get();
 
         return User::query()->whereIn('id', $likedMe)->get();
     }
 
-    public function theMatched($user_id, $target_id, $status)
+    public function like(StoreRequest $req, Request $request, $target_id)
     {
+        $user_token = $request->authorization;
+
+        $user = PersonalAccessToken::findToken($user_token);
+
+        $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
+
+        $data = $req->validated();
+
+        $data['user_id'] = $user_id;
+        $data['user_target_id'] = $target_id;
+
+        $data->save();
+
+        $response = [
+            "message" => "лайкнуто"
+        ];
+    }
+
+    public function theMatched(Request $request, $target_id, $status)
+    {
+        $user_token = $request->authorization;
+
+        $user = PersonalAccessToken::findToken($user_token);
+
+        $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
+
         Match::query()->where('user_id', $user_id)->where('target_user_id', $target_id)->update(['status' => $status]);
 
         $response = [
@@ -111,6 +152,20 @@ class MatchController extends Controller
         ];
 
         return response($response, 201);
+    }
+
+    public function showMatched(Request $request)
+    {
+        $user_token = $request->authorization;
+
+        $user = PersonalAccessToken::findToken($user_token);
+
+        $user_id = User::query()->where('id', $user->tokenable_id)->value('id');
+
+        $likedMe = Match::query()->select('user_id')->where('target_user_id', $user_id)->where('status', 0)->get();
+
+        return User::query()->whereIn('id', $likedMe)->get();
+
     }
 
 }
