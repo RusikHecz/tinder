@@ -44,8 +44,8 @@ Route::get('/messages/view/', [ListConversationAndMessages::class, 'viewMessage'
 Route::get('/messages/send/', [ListConversationAndMessages::class, 'sendMessage']);
 Route::get('/messages/create-new-chat/', [ListConversationAndMessages::class, 'createChat']);
 
-Route::get('/graphics/males/', [GraphicsController::class, 'getMales']);
-Route::get('/graphics/females/', [GraphicsController::class, 'getFemales']);
+Route::get('/graphics/getGenders/', [GraphicsController::class, 'getGenders']);
+Route::get('/graphics/age/', [GraphicsController::class, 'getAge']);
 Route::get('/graphics/getOne/', [GraphicsController::class, 'getOne']);
 Route::get('/graphics/getZero/', [GraphicsController::class, 'getZero']);
 
