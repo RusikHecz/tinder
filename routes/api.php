@@ -47,7 +47,7 @@ Route::get('/messages/create-new-chat/', [ListConversationAndMessages::class, 'c
 Route::get('/graphics/getGenders/', [GraphicsController::class, 'getGenders']);
 Route::get('/graphics/age/', [GraphicsController::class, 'getAge']);
 Route::get('/graphics/getOne/', [GraphicsController::class, 'getOne']);
-Route::get('/graphics/getZero/', [GraphicsController::class, 'getZero']);
+Route::get('/graphics/getStatuses/', [GraphicsController::class, 'getStatuses']);
 
 
 //protected routes

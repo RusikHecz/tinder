@@ -41,7 +41,15 @@ class GraphicsController
 
     }
 
-    public function getZero(){
-        return Match::query()->where('status', 0)->count();
+    public function getStatuses(){
+        $accept = Match::query()->where('status', 1)->count();
+        $reject = Match::query()->where('status', -1)->count();
+
+        $response = [
+            'matched' => $accept,
+            'rejected' => $reject,
+        ];
+
+        return response($response, 201);
     }
 }
